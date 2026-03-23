@@ -1,0 +1,89 @@
+# Algorithm Design and Analysis (Spring 2026)
+
+## P1
+(15 points) Prove the following generalization of the master theorem. Given constants $a \geq 1 , b > 1 , d \geq 0$ , and $w \geq 0$ , if $T ( n ) = 1$ for $n < b$ and $T ( n ) = a T ( n / b ) + n ^ { d } \log ^ { w } n$ , we have
+
+$$
+T(n) = \left\{
+\begin{array}{l l}
+O(n^{d} \log^{w} n), & \text{if } a < b^{d}, \\
+O(n^{\log_{b} a}), & \text{if } a > b^{d}, \\
+O(n^{d} \log^{w+1} n), & \text{if } a = b^{d}.
+\end{array}
+\right.
+$$
+
+Prove by drawing a table: 
+| level | num of problems | problem scale | level complexity |
+| ----- | --------------- | ------------- | ---------------- |
+| $0$ | $1$ | $n$ | $n^d\log^w{n}$ |
+| $1$ | $a$ | $\frac{n}{b}$ | $a \cdot \left ( \frac{n}{b} \right )^d\log^w{\left( \frac{n}{b} \right)}$ |
+| $2$ | $a^2$ | $\frac{n}{b^2}$ | $a^2 \cdot \left ( \frac{n}{b^2} \right )^d\log^w{\left( \frac{n}{b^2} \right)}$ |
+| $k$ | $a^k$ | $\frac{n}{b^k}$ | $a^k \cdot \left ( \frac{n}{b^k} \right )^d\log^w{\left( \frac{n}{b^k} \right)}$ |
+| $\dots$ |  |  |  |
+| $\log_b{n}$ | $a^{\log_b{n}}$ | $1$ | $a^{\log_b{n}}$ |
+
+The total running time is
+$$n^d\log^w{n} + a \cdot \left ( \frac{n}{b} \right )^d\log^w{\left( \frac{n}{b} \right)} + \cdots + a^k \cdot \left ( \frac{n}{b^k} \right )^d\log^w{\left( \frac{n}{b^k} \right)} + \cdots + a^{\log_b{n}}$$
+
+Simplification
+
+$$n^d \cdot \left( \log^w{n}+\frac{a}{b^d}\log^w\left(\frac{n}{b}\right) + \cdots \left( \frac{a}{b^d}\right)^k\log^w\left(\frac{n}{b^k}\right) + \cdots + \left (\frac{a}{b^d}\right)^{\log_b{n}} \right)$$
+
+Convert into sum expression 
+
+$$T(n) = n^d \cdot \left( \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k \left( \log{n} - k \log{b}\right)^w\right)+n^{\log_b{a}}$$ 
+
+> Note: When $k=\log_b{n}$, $\log^w\left( \frac{n}{b^k}\right) = 0$, the leaf cost vanishes. But $T(1)$ is actually $1$. So we must add the last term $a^{\log_b{n}} = a^{\frac{\log_a{n}}{\log_a{b}}} = n^{\log_b{a}}$ separately.
+
+- Case 1: $a < b^d$: 
+    $$T(n) < n^d \log^w{n}\cdot  \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k +n^{\log_b{a}}$$
+    Given $\tfrac{a}{b^d} < 1$, $\sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k < \sum_{k=0} ^{\infty} \left( \frac{a}{b^d}\right)^k = O(1)$. So
+    $$T(n) = O(n^d \log^w{n} +n^{\log_b{a}})$$
+    We also have $\log_b a <d$. So $n^{\log_b{a}} < n^d$. Thus
+    $$T(n) = O(n^d \log^w{n})$$
+- Case 2: $a > b^d$:
+  In this case $\tfrac{a}{b^d} > 1$. The last term dominates the total complexity. We set $j = \log_b {n}- k$
+
+    $$\begin{align*} T(n) & = n^d \cdot \left( \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k \left( \log{n} - k \log{b}\right)^w\right)+n^{\log_b{a}} \\
+    & = n^d \cdot \left( \sum_{j = 0} ^ {\log_b n} \left( \frac{a}{b^d}\right)^{\log_b{n}-j} \left( j\log{b} \right)^w \right) + n^{\log_b{a}}\\ 
+    & = n^{\log_b{a}} \cdot \left( \sum_{j = 0} ^ {\log_b n} \left( \frac{a}{b^d}\right)^{-j} \left( j\log{b} \right)^w \right) + n^{\log_b{a}}\\
+    & = n^{\log_b{a}} \cdot \left( \sum_{j = 0} ^ {\log_b n} \left( \frac{a}{b^d}\right)^{-j} \left( j\log{b} \right)^w + 1\right)
+     \end{align*}$$ 
+    Let's consider the summation term. For the sake of simplification, we denote $a/b^d$ as $r$, and ignore the constant coefficient $\log^w{b}$.
+    $$\sum_{j = 0} ^ {\log_b n} \left( \frac{a}{b^d}\right)^{-j} \left( j\log{b} \right)^w \propto \sum_{j = 0} ^ {\log_b n} r^{-j} j^w < \sum_{j = 0} ^ {\infty} r^{-j} j^w$$
+    Since $r <1$, the summation term consists of an exponential decay and a polynomial increase. We know the sum converges. i.e. $\exist C \in \mathbb{R}$, s.t. $\sum_{j = 0} ^ {\infty} r^{-j} j^w < C$. So the huge scaring summation factor is actually $O(1)$. We can now conclude that
+    $$T(n) = O(n^{\log_b{a}})$$
+- Case 3: $a = b^d$:
+    $$\begin{align*}T(n) & = n^d \cdot  \sum_{k=0} ^{\log_b{n}} \left( \log{n} - k \log{b}\right)^w+n^d \\
+    & < n^d \cdot \log_b {n} \cdot \log ^w {n} + n^d \\
+    & = \frac{1}{\log b} n^d \log^{w+1} n + n^d \\
+    & = O(n^d \log^{w+1} {n})
+    \end{align*}$$ 
+
+
+## P2
+(25 points) Consider the randomized quicksort algorithm, where each pivot is chosen uniformly at random. Analyze its expected running time.
+
+- a. (10 points) Prove that the expected running time is $O ( n ^ { c } )$ for some constant $c < 2$ , using a method similar to the one presented in lecture. (You may choose any constant $c < 2$ .) In particular, define a suitable “lucky” event, and analyze the lucky and unlucky cases separately.
+
+- b. (15 points) Prove that the expected running time is $O ( n \log n )$ . Hint: Let $x _ { i }$ be the $i$ -th smallest element and $x _ { j }$ the $j$ -th smallest element, where $j > i$ . Show that $x _ { i }$ and $x _ { j }$ are compared in quicksort if and only if either $x _ { i }$ or $x _ { j }$ is the first pivot chosen among the elements $x _ { i } , x _ { i + 1 } , \dotsc , x _ { j }$ . What is the probability of this event?
+
+## P3
+
+(30 points) Given an $n \times m$ 2-dimensional integer array $A | 0 , \ldots , n - 1 ; 0 , \ldots , m - 1 |$ where $A [ i , j ]$ denotes the cell at the $i$ -th row and the $j$ -th column, a local minimum is a cell $A [ i , j ]$ such that $A [ i , j ]$ is smaller than each of its four adjacent cells $A [ i - 1 , j ] , A [ i +$ $1 , j ] , A [ i , j - 1 ] , A [ i , j + 1 ]$ . Notice that $A [ i , j ]$ only has three adjacent cells if it is on the boundary, and it only has two adjacent cells if it is at the corner. Assume all the cells have distinct values. Your objective is to find one local minimum (i.e., you do not have to find all of them).
+
+- a. (10 points) Suppose $m = 1$ so $A$ is a 1-dimensional array. Design a divide-andconquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.   
+- b. (10 points) Suppose $m = n$ . Design a divide-and-conquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.   
+- c. (10 points) Generalize your algorithm such that it works for general $m$ and $n$ . The running time of your algorithm should smoothly interpolate between the running times for the first two parts.
+
+## P4
+
+(30 points) We are given a $n$ -vertex tournament graph ${ \vec { G } } = ( V , A )$ , which is a directed version of a complete undirected graph $G = ( V , E )$ . For each undirected edge $e =$ $( u , v ) \in E$ , we have a corresponding directed arc ( $u  v$ or $v  u$ ) in $A$ . We aim to design an efficient algorithm to find a directed Hamiltonian path in $\vec { G }$ , which is a path including all vertices in $V$ , such as $u _ { 1 } \to u _ { 2 } \to u _ { 3 } \dots \to u _ { n }$ .
+
+- a. (15 points) Assume we have a path $P$ with length $k$ , and another vertex $u$ not included in $P$ . Prove that we can always find a feasible location in $P$ to insert $u$ . (E.g., when $P = v _ { 1 }  v _ { 2 }  v _ { 3 }$ , we can insert $u$ into $P$ and change $P$ to $v _ { 1 }  u  v _ { 2 }  v _ { 3 }$ if $v _ { 1 }  u$ and $u \to v _ { 2 }$ are both in $A$ .) Design an $O ( k )$ algorithm to find a feasible location to insert $u$ into $P$ , analyze the running time, and prove the correctness.   
+- b. (15 points) Use divide and conquer to find a $O ( n \log n )$ algorithm to find a directed Hamiltonian path, analyze the running time, and prove the correctness.
+
+--- 
+
+ How long does it take you to finish the assignment (including thinking and discussion)? Give a score (1,2,3,4,5) to the difficulty. Do you have any collaborators? Please write down their names here.
