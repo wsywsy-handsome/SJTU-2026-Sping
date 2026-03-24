@@ -129,7 +129,54 @@ $$E(T(n)) = O(n\log{n})$$
 
 (30 points) Given an $n \times m$ 2-dimensional integer array $A | 0 , \ldots , n - 1 ; 0 , \ldots , m - 1 |$ where $A [ i , j ]$ denotes the cell at the $i$ -th row and the $j$ -th column, a local minimum is a cell $A [ i , j ]$ such that $A [ i , j ]$ is smaller than each of its four adjacent cells $A [ i - 1 , j ] , A [ i +$ $1 , j ] , A [ i , j - 1 ] , A [ i , j + 1 ]$ . Notice that $A [ i , j ]$ only has three adjacent cells if it is on the boundary, and it only has two adjacent cells if it is at the corner. Assume all the cells have distinct values. Your objective is to find one local minimum (i.e., you do not have to find all of them).
 
-- a. (10 points) Suppose $m = 1$ so $A$ is a 1-dimensional array. Design a divide-andconquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.   
+- a. (10 points) Suppose $m = 1$ so $A$ is a 1-dimensional array. Design a divide-andconquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.
+
+  **Algorighm:**
+  First check the position `mid = (left+right)/2` and its neighbors.
+  - case 1: `mid` is a local minimum
+    if $A[\text{mid}] < A[\text{mid}-1] \text{ 且 } A[\text{mid}] < A[\text{mid}+1]$ then return mid
+  - case 2: The left neighbor is smaller
+    if $A[\text{mid}-1] < A[\text{mid}]$, there exists a local min in the left half of the array. So recursively search left half of the array.
+  - case 3: The right neighbor is smaller
+    Symmetrical to case 2, recursively search the right hand of the array. 
+    
+  **Pseudo code**:
+  ```python
+  def LocalMin(A, left, right):
+    """
+    Args:
+        A: the array to find a local minimum
+        left: the left bound of searching interval
+        right: the right bound of searching interval 
+    Returns:
+        A local minimum in A[left: right]
+    """
+    if (left = right):
+        return left
+    mid = (left + right) // 2
+    
+    if (A[mid] < A[mid-1] and A[mid] < A[mid+1]):
+        return mid
+    elif (A[mid-1] < A[mid]):
+        return LocalMin(A, left, mid-1)
+    else:
+        return LocalMin(A, mid+1, right)
+  ```
+  **Validity analysis**
+  We need to show that if $A[\text{mid}-1] < A[\text{mid}]$, then there exists a local minimum $A[k]$ s.t. $\text{left} \leq k \leq \text{mid}-1$. 
+
+  If the subsequence is strictly increasing, we claim $A[\text{left}]$ is a local minimum. In fact, if $\text{left} = 0$, in other word $A[\text{left}]$ is in the on the boundary, by defination it is a local minimum. If $\text{left} \neq 0$, by recursive hypothesis, $A[\text{left}] < A[\text{left}-1]$. The increase of the sequence implies that $A[\text{left}] < A[\text{left}+1]$. So $A[\text{left}]$ is a local minimum.
+
+  If the subsequence is not strictly increasing, then there exists an index $k$ such that $A[k] < A[k-1]$ and $A[k] < A[k+1]$. In particular, when the subsequence is strictly decreasing, $k = \text{mid}-1$.
+
+  Hence, a local minimum must exist in the left halr.
+
+  **Complexity analysis**
+  $$T(n) = T(\tfrac{n}{2}) + O(1)$$
+
+  By master theorem
+  $$T(n) = O(\log{n})$$
+  
 - b. (10 points) Suppose $m = n$ . Design a divide-and-conquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.   
 - c. (10 points) Generalize your algorithm such that it works for general $m$ and $n$ . The running time of your algorithm should smoothly interpolate between the running times for the first two parts.
 
