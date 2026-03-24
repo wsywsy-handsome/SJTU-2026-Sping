@@ -129,9 +129,10 @@ $$E(T(n)) = O(n\log{n})$$
 
 (30 points) Given an $n \times m$ 2-dimensional integer array $A | 0 , \ldots , n - 1 ; 0 , \ldots , m - 1 |$ where $A [ i , j ]$ denotes the cell at the $i$ -th row and the $j$ -th column, a local minimum is a cell $A [ i , j ]$ such that $A [ i , j ]$ is smaller than each of its four adjacent cells $A [ i - 1 , j ] , A [ i +$ $1 , j ] , A [ i , j - 1 ] , A [ i , j + 1 ]$ . Notice that $A [ i , j ]$ only has three adjacent cells if it is on the boundary, and it only has two adjacent cells if it is at the corner. Assume all the cells have distinct values. Your objective is to find one local minimum (i.e., you do not have to find all of them).
 
-- a. (10 points) Suppose $m = 1$ so $A$ is a 1-dimensional array. Design a divide-andconquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.
+ a. (10 points) Suppose $m = 1$ so $A$ is a 1-dimensional array. Design a divide-andconquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.
 
-  **Algorighm:**
+  **Algorithm**
+
   First check the position `mid = (left+right)/2` and its neighbors.
   - case 1: `mid` is a local minimum
     if $A[\text{mid}] < A[\text{mid}-1] \text{ 且 } A[\text{mid}] < A[\text{mid}+1]$ then return mid
@@ -149,36 +150,131 @@ $$E(T(n)) = O(n\log{n})$$
         left: the left bound of searching interval
         right: the right bound of searching interval 
     Returns:
-        A local minimum in A[left: right]
+        a local minimum in A[left: right]
     """
-    if (left = right):
+    if (left == right):
         return left
+
     mid = (left + right) // 2
+
+    left_val = A[mid-1] if mid > left else INF # handle boundary situation
+    right_val = A[mid+1] if mid < right else INF
     
-    if (A[mid] < A[mid-1] and A[mid] < A[mid+1]):
+    if (A[mid] < left_val and A[mid] < right_val):
         return mid
-    elif (A[mid-1] < A[mid]):
+    elif (left_val < A[mid]):
         return LocalMin(A, left, mid-1)
     else:
         return LocalMin(A, mid+1, right)
   ```
   **Validity analysis**
+
   We need to show that if $A[\text{mid}-1] < A[\text{mid}]$, then there exists a local minimum $A[k]$ s.t. $\text{left} \leq k \leq \text{mid}-1$. 
 
-  If the subsequence is strictly increasing, we claim $A[\text{left}]$ is a local minimum. In fact, if $\text{left} = 0$, in other word $A[\text{left}]$ is in the on the boundary, by defination it is a local minimum. If $\text{left} \neq 0$, by recursive hypothesis, $A[\text{left}] < A[\text{left}-1]$. The increase of the sequence implies that $A[\text{left}] < A[\text{left}+1]$. So $A[\text{left}]$ is a local minimum.
+  If the subsequence is strictly increasing, we claim $A[\text{left}]$ is a local minimum. In fact, if $\text{left} = 0$, in other word $A[\text{left}]$ is in the on the boundary, by definition it is a local minimum. If $\text{left} \neq 0$, by recursive hypothesis, $A[\text{left}] < A[\text{left}-1]$. The increase of the sequence implies that $A[\text{left}] < A[\text{left}+1]$. So $A[\text{left}]$ is a local minimum.
 
   If the subsequence is not strictly increasing, then there exists an index $k$ such that $A[k] < A[k-1]$ and $A[k] < A[k+1]$. In particular, when the subsequence is strictly decreasing, $k = \text{mid}-1$.
 
-  Hence, a local minimum must exist in the left halr.
+  Hence, a local minimum must exist in the left half.
 
   **Complexity analysis**
+
   $$T(n) = T(\tfrac{n}{2}) + O(1)$$
 
   By master theorem
   $$T(n) = O(\log{n})$$
   
-- b. (10 points) Suppose $m = n$ . Design a divide-and-conquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time.   
-- c. (10 points) Generalize your algorithm such that it works for general $m$ and $n$ . The running time of your algorithm should smoothly interpolate between the running times for the first two parts.
+---
+
+  b. (10 points) Suppose $m = n$ . Design a divide-and-conquer-based algorithm for the problem above. Write a recurrence relation of the algorithm, and analyze its running time. 
+
+  **Algorithm**
+  
+  We implement a divide-and-conquer approach by performing a binary search on the rows.
+
+  1. Pick the middle row `mid_row = (upper + lower) // 2`.
+  2. Find the global minimum of this row. Let the minimum be at $A[\text{mid\_row}][i]$, where $0\leq i \leq n-1$.
+  3. Compare $A[\text{mid\_row}][i]$ with its vertical neighbors $A[\text{mid\_row}-1][i]$ and $A[\text{mid\_row}+1][i]$ (if exist)
+      - case 1: $A[\text{mid\_row}][i]$ is smaller than their neighbors, then $A[\text{mid\_row}][i]$ is already a local minimum. Return it.
+      - case 2: $A[\text{mid\_row}-1][i] < A[\text{mid\_row}][i]$, there exist a local minimum in the upper half of the matrix. Recursively search the upper half sub-matrix.
+      - case 3: $A[\text{mid\_row}+1][i] < A[\text{mid\_row}][i]$, symmetric to case 2, recursively search the lower half sub-matrix.
+    
+**Pseudo code**
+  ```python
+  def LocalMin2D(A, upper, lower):
+    """
+    Args:
+        A: The n * n 2D array
+        upper, lower: The row boundaries for the current search.
+    Returns:
+        The coordinates (i, j) of a local minimum
+    """
+    if (upper == lower):
+        min_column = argmin(k, A[upper][k]) # The column num of the minimum in this row. O(n) complexity
+        return (upper, min_column)
+    
+    mid_row = (upper + lower) // 2
+
+    min_column = argmin(k, A[mid_row][k]) # O(n) complexity
+    current_val = A[mid_row][min_column]
+    upper_val = A[mid_row-1][min_column] if mid_row > upper else INF # handle boundary situations
+    lower_val = A[mid_row+1][min_column] if mid_row < lower else INF
+
+    if (current_val < upper_val and current_val < lower_val):
+        return (mid_row, min_column)
+    elif (upper_val < current_val):
+        return LocalMin2D(A, upper, mid_row-1)
+    else:
+        return LocalMin2D(A, mid_row+1, lower)
+  ```
+
+  **Validity analysis**
+
+  If the recursion returns **before** reach the base case, where $\text{upper} = \text{lower}$, it is trival that the return value is a local minimum.
+
+  If the recursion reaches the base case, we need to check whether the return value is smaller than its vertical neighbors.
+
+  In fact, when we reach the base case, by recursion hypothesis, the value of some column in the row is smaller than the minimum of its two neighbor rows (if exists). That's why we come to this specific row. Further more, the value of the returned coordinate is even smaller than (or equal to) that of the "some column" described before. So the value of the returned coordinate is smaller than its vertical neighbors.
+
+  The above is my explaination, which is not necessarily formal and accurate. Here I paste a graph of Chat-GPT's insight:
+
+  > At each step, we select the minimum element in the middle row. Therefore, this element is smaller than its horizontal neighbors.
+  >
+  > If it is also smaller than its vertical neighbors, then it is a local minimum.
+  >
+  > Otherwise, suppose the upper neighbor is smaller. Then we claim that there exists a local minimum in the upper half.
+  >
+  > Starting from this smaller neighbor, we can follow a path of strictly decreasing values. Since all values are distinct and the matrix is finite, this path must terminate at a cell that is smaller than all of its neighbors, i.e., a local minimum.
+  >
+  > Hence, the recursion is correct.
+
+  **Complexity analysis**
+
+  The complexity of an $n\times m$ grid is $T(n, m)$ then
+  $$T(n, m) = T(n/2, m) + O(m)$$
+  The $O(n)$ complexity comes from the `argmin` function. 
+  There are in total $\log {n}$ levels of recursion before we reach the base case. Each level contributes an $O(m)$ complexity. Thus
+  
+  $$T(n, m) = O(m\log{n})$$
+
+  In this question, $m = n$, so 
+  $$T(n) = O(n\log{n})$$
+
+---
+
+  c. (10 points) Generalize your algorithm such that it works for general $m$ and $n$ . The running time of your algorithm should smoothly interpolate between the running times for the first two parts.
+
+  We can naturally generalize the algorithm in (b). But consider the different rate at which $m$ and $n$ influence the total running time, we implement a trick here:
+
+  **Algorithm**
+
+  If $m>n$, run $\operatorname{LocalMin2D}(A^T)$. 
+
+  Otherwise run $\operatorname{LocalMin2D}(A)$.
+
+  **Complexity**
+
+  $$T(n, m) = O(\min{(m, n)}\log{(\max{(m, n)})})$$
 
 ## P4
 
