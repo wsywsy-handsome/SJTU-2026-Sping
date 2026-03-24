@@ -65,9 +65,65 @@ $$T(n) = n^d \cdot \left( \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k 
 ## P2
 (25 points) Consider the randomized quicksort algorithm, where each pivot is chosen uniformly at random. Analyze its expected running time.
 
-- a. (10 points) Prove that the expected running time is $O ( n ^ { c } )$ for some constant $c < 2$ , using a method similar to the one presented in lecture. (You may choose any constant $c < 2$ .) In particular, define a suitable “lucky” event, and analyze the lucky and unlucky cases separately.
+a. (10 points) Prove that the expected running time is $O ( n ^ { c } )$ for some constant $c < 2$ , using a method similar to the one presented in lecture. (You may choose any constant $c < 2$ .) In particular, define a suitable “lucky” event, and analyze the lucky and unlucky cases separately.
 
-- b. (15 points) Prove that the expected running time is $O ( n \log n )$ . Hint: Let $x _ { i }$ be the $i$ -th smallest element and $x _ { j }$ the $j$ -th smallest element, where $j > i$ . Show that $x _ { i }$ and $x _ { j }$ are compared in quicksort if and only if either $x _ { i }$ or $x _ { j }$ is the first pivot chosen among the elements $x _ { i } , x _ { i + 1 } , \dotsc , x _ { j }$ . What is the probability of this event?
+Proof: We call a pivot $p$ *lucky* if $p \in [\tfrac{n}{3} , \tfrac{2n}{3}]$. If $p$ is not lucky, then it is *unlucky*.
+
+The recursive form of the compexity of quicksort is
+
+$$T(n) = T(L) + T(R) + O(n)$$
+
+Where $L + R = n-1$.
+
+- Case 1: The pivot is lucky
+  $$\max{(L, R)} \leq \frac{2n}{3}$$
+  In this case, 
+  $$T(n) \leq 2T \left( \frac{2n}{3} \right) + O(n)$$
+
+- Case 2: The pivot is unlucky
+
+  We consider the worst case
+
+  $$T(n) \leq T(n-1) + O(n)$$
+
+We assume the pivot $p$ is uniformly distributed. So $P(p \text{ is lucky}) = \frac{1}{3}$. Let $\tau (n)$ be the total cost we take until the first lucky pivot occurs. Since we are lucky with the probability $\tfrac{1}{3}$, the depth of our recursion before we get a lucky pivot follows a geometric distribution with expectation 3. So $E(\tau(n)) = O(n)$
+
+$$T(n) = \tau(n) + 2T(\tfrac{2n}{3})$$
+
+We take expectation from both side
+
+$$E(T(n)) = 2E(T(\tfrac{2n}{3})) + O(n)$$
+
+Refer to the master theorem, $E(T(n)) = O\left(n^{\log_{\tfrac{3}{2}}{2}}\right) = O(n^{1.71})$. We conclude 
+
+$$E(T(n)) = O(n^c) \text{,}\quad c = 1.71 < 2$$
+
+b. (15 points) Prove that the expected running time is $O ( n \log n )$ . Hint: Let $x _ { i }$ be the $i$ -th smallest element and $x _ { j }$ the $j$ -th smallest element, where $j > i$ . Show that $x _ { i }$ and $x _ { j }$ are compared in quicksort if and only if either $x _ { i }$ or $x _ { j }$ is the first pivot chosen among the elements $x _ { i } , x _ { i + 1 } , \dotsc , x _ { j }$ . What is the probability of this event?
+
+Proof:
+Let $x_i$ and $x_j$ be the $i$-th and $j$-th smallest element relatively $(i<j)$. Define indicator variable:
+$$X_{ij} = \begin{cases}
+    1 \quad \text{if } x_i \text{ and } x_j \text{ are compared} \\
+    0 \quad \text{otherwise}
+\end{cases}$$
+Then the total comparisons:
+$$X = \sum_{i<j} X_{ij}$$
+
+The expectation:
+$$E(X) = \sum_{i<j} E(X_ij) = \sum_{i<j} P(x_i \text{ and } x_j \text{ are compared})$$
+We claim that $x_j$ and $x_j$ are compared in quicksort iff either $x_i$ or $x_j$ is the first pivot chosen among $x_i, x_{i+1}, \cdots , x_j$. In fact, if some $x_k \, (i<k<j)$ is chosen first as a pivot, then $x_i$ and $x_j$ are divided into different sub questions, and are never compared. On the other hand, if $x_i$ or $x_j$ is chosen as a pivot, then $x_i$ and $x_j$ must be compared.
+
+Since the pivot is chosen uniformly:
+$$P(x_i \text{ and } x_j \text{ are compared} ) = \frac{2}{j-i+1}$$
+
+Thus
+$$E(X) = \sum_{i<j} \frac{2}{j-i+1}$$
+
+Let $k = j-i$, then
+$$E(X) = \sum_{k=1}^{n-1}(n-k) \cdot \frac{2}{k+1} \leq \sum_{k=1}^n \frac{2}{k+1}\cdot n = O(n\log{n})$$
+
+Therefore:
+$$E(T(n)) = O(n\log{n})$$
 
 ## P3
 
@@ -87,3 +143,9 @@ $$T(n) = n^d \cdot \left( \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k 
 --- 
 
  How long does it take you to finish the assignment (including thinking and discussion)? Give a score (1,2,3,4,5) to the difficulty. Do you have any collaborators? Please write down their names here.
+
+ | problem | difficulty | comment |
+ | ------- | ---------- | ------- |
+ | 1 | 16384 | 初见端倪 |
+ | 2 | 32768 | AI 汗流浃背 |
+ | 3 | 65536 | 666演都不演了 |
