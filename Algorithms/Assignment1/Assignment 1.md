@@ -32,16 +32,35 @@ $$n^d \cdot \left( \log^w{n}+\frac{a}{b^d}\log^w\left(\frac{n}{b}\right) + \cdot
 
 Convert into sum expression 
 
-$$T(n) = n^d \cdot \left( \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k \left( \log{n} - k \log{b}\right)^w\right)+n^{\log_b{a}}$$ 
+$$
+T(n) = n^d \cdot \left( \sum_{k=0}^{\log_{b} n} \left( \frac{a}{b^d} \right)^k \left( \log n - k \log b \right)^w \right) + n^{\log_{b} a}
+$$
 
-> Note: When $k=\log_b{n}$, $\log^w\left( \frac{n}{b^k}\right) = 0$, the leaf cost vanishes. But $T(1)$ is actually $1$. So we must add the last term $a^{\log_b{n}} = a^{\frac{\log_a{n}}{\log_a{b}}} = n^{\log_b{a}}$ separately.
+> Note: When $k = \log_{b} n$, $\left( \log \frac{n}{b^k} \right)^w = 0$, the leaf cost vanishes. But $T(1)$ is actually $1$. So we must add the last term $a^{\log_{b} n} = a^{\frac{\log_{a} n}{\log_{a} b}} = n^{\log_{b} a}$ separately.
 
-- Case 1: $a < b^d$: 
-    $$T(n) < n^d \log^w{n}\cdot  \sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k +n^{\log_b{a}}$$
-    Given $\tfrac{a}{b^d} < 1$, $\sum_{k=0} ^{\log_b{n}} \left( \frac{a}{b^d}\right)^k < \sum_{k=0} ^{\infty} \left( \frac{a}{b^d}\right)^k = O(1)$. So
-    $$T(n) = O(n^d \log^w{n} +n^{\log_b{a}})$$
-    We also have $\log_b a <d$. So $n^{\log_b{a}} < n^d$. Thus
-    $$T(n) = O(n^d \log^w{n})$$
+- Case 1: $a < b^d$
+  $$
+  T(n) < n^d \log^w n \cdot \sum_{k=0}^{\log_{b} n} \left( \frac{a}{b^d} \right)^k + n^{\log_{b} a}
+  $$
+
+  Given $\frac{a}{b^d} < 1$, 
+
+  $$
+  \sum_{k=0}^{\log_{b} n} \left( \frac{a}{b^d} \right)^k 
+  < \sum_{k=0}^{\infty} \left( \frac{a}{b^d} \right)^k = O(1)
+  $$
+
+  So
+
+  $$
+  T(n) = O(n^d \log^w n + n^{\log_{b} a})
+  $$
+
+  We also have $\log_{b} a < d$. So $n^{\log_{b} a} < n^d$. Thus
+
+  $$
+  T(n) = O(n^d \log^w n)
+  $$
 - Case 2: $a > b^d$:
   In this case $\tfrac{a}{b^d} > 1$. The last term dominates the total complexity. We set $j = \log_b {n}- k$
 
@@ -157,7 +176,8 @@ $$E(T(n)) = O(n\log{n})$$
 
     mid = (left + right) // 2
 
-    left_val = A[mid-1] if mid > left else INF # handle boundary situation
+    # handle boundary situation
+    left_val = A[mid-1] if mid > left else INF
     right_val = A[mid+1] if mid < right else INF
     
     if (A[mid] < left_val and A[mid] < right_val):
@@ -210,14 +230,16 @@ $$E(T(n)) = O(n\log{n})$$
         The coordinates (i, j) of a local minimum
     """
     if (upper == lower):
-        min_column = argmin(k, A[upper][k]) # The column num of the minimum in this row. O(n) complexity
+        # obtain the column num of the minimum in this row
+        min_column = argmin(k, A[upper][k]) # O(n) complexity
         return (upper, min_column)
     
     mid_row = (upper + lower) // 2
 
     min_column = argmin(k, A[mid_row][k]) # O(n) complexity
     current_val = A[mid_row][min_column]
-    upper_val = A[mid_row-1][min_column] if mid_row > upper else INF # handle boundary situations
+    # handle boundary situations
+    upper_val = A[mid_row-1][min_column] if mid_row > upper else INF
     lower_val = A[mid_row+1][min_column] if mid_row < lower else INF
 
     if (current_val < upper_val and current_val < lower_val):
