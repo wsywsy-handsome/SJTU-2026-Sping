@@ -351,7 +351,9 @@ def merge(P1: List[Vertex], P2: List[Vertex]) -> List[Vertex]:
         P.append(P2[j])
         j += 1
     return P
+```
 
+```python
 def HamiltonianPath(V: List[Vertex]) -> List[Vertex]:
     """
     Args:
@@ -403,8 +405,8 @@ $$T(n) = O(n \log n)$$
 
  | Problem | Time spent | Difficulty | Dependence on LLM | Comment |
  | ------- | ---------- | ---------- | ----------------- | ------- |
- | 1 | 一个下午 | 50% | 3 | 没有 LLM 我就证不出来 Case2 |
- | 2 | 半个晚上 | 50% | 2 | 在宿舍写的，舍友叫我别卷（ |
- | 3 | 3 节水课 | 75% | 4 | 家人们 AI 真是太好用了 |
- | 4 | 2 节水课 | 50% | 3 | 终于写完了！耶 |
- | 5 | 实时维护 | 0% | 0 |
+ | 1 | 一个下午 | 3 | 50% | 没有 LLM 我就证不出来 Case2 |
+ | 2 | 半个晚上 | 2 | 50% | 在宿舍写的，舍友叫我别卷（ |
+ | 3 | 3 节水课 | 4 | 70% | 家人们 AI 真是太好用了 |
+ | 4 | 2 节水课 | 3 | 50% | 终于写完了！耶 |
+ | 5 | 实时维护 | 0 | 0 |
