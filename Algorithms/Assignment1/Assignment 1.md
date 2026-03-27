@@ -374,11 +374,16 @@ def HamiltonianPath(V: List[Vertex]) -> List[Vertex]:
 
 **Validity analysis**
 
-* Each recursive call returns a valid Hamiltonian path.
-* During merge, for any two candidate vertices $a_i$ and $b_j$, exactly one of $a_i \to b_j$ or $b_j \to a_i$ holds.
-* The algorithm always appends the vertex that maintains the path direction.
-* Hence, the merged sequence is a valid directed path containing all vertices.
+We know the facts:
+1. Each recursive call returns a valid Hamiltonian path.
+2. During merge, for any two candidate vertices $a_i$ and $b_j$, exactly one of $a_i \to b_j$ or $b_j \to a_i$ holds.
+3. During merge, the algorithm always appends the vertex whose outgoing edge points to the other.
 
+Let $P$ be the path being constructed during the merge. Suppose at some step,  $x$ is the latest vertex in $P$, and $y$ is the next vertex to be append. 
+- If $x$ and $y$ are from the same path. By fact 1, it is natural that $x \to y$.
+- Otherwise, $x$ and $y$ are from different paths. If $y \to x$ holds, then in the previous step, where $x$ and $y$ are the two candidates, the algorithm chose $x$ instead of $y$. This violates fact 3. By fact 2, $x \to y$ holds.
+
+Thus every consecutive pair in the merged sequence satisfies the required direction, and the sequence contains all vertices. By induction, the final path is a directed Hamiltonian path of the whole tournament.
 
 **Running time**
 
@@ -392,14 +397,14 @@ Thus
 
 $$T(n) = O(n \log n)$$
 
---- 
+## P5
 
  How long does it take you to finish the assignment (including thinking and discussion)? Give a score (1,2,3,4,5) to the difficulty. Do you have any collaborators? Please write down their names here.
 
- | problem | difficulty | dependence on LLM | comment |
- | ------- | ---------- | ----------------- | ------- |
- | 1 | 16384 | 50% | 初见端倪 |
- | 2 | 32768 | 50% | AI 汗流浃背 |
- | 3 | 65536 | 75% | 666演都不演了 |
- | 4 | 32768 | 50% | 终于写完了！耶 |
- | 5 | 1     | 0% | 这题可以，能处 |
+ | Problem | Time spent | Difficulty | Dependence on LLM | Comment |
+ | ------- | ---------- | ---------- | ----------------- | ------- |
+ | 1 | 一个下午 | 50% | 3 | 没有 LLM 我就证不出来 Case2 |
+ | 2 | 半个晚上 | 50% | 2 | 在宿舍写的，舍友叫我别卷（ |
+ | 3 | 3 节水课 | 75% | 4 | 家人们 AI 真是太好用了 |
+ | 4 | 2 节水课 | 50% | 3 | 终于写完了！耶 |
+ | 5 | 实时维护 | 0% | 0 |
