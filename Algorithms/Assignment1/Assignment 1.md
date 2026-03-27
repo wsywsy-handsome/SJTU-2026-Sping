@@ -300,17 +300,106 @@ $$E(T(n)) = O(n\log{n})$$
 
 ## P4
 
-(30 points) We are given a $n$ -vertex tournament graph ${ \vec { G } } = ( V , A )$ , which is a directed version of a complete undirected graph $G = ( V , E )$ . For each undirected edge $e =$ $( u , v ) \in E$ , we have a corresponding directed arc ( $u  v$ or $v  u$ ) in $A$ . We aim to design an efficient algorithm to find a directed Hamiltonian path in $\vec { G }$ , which is a path including all vertices in $V$ , such as $u _ { 1 } \to u _ { 2 } \to u _ { 3 } \dots \to u _ { n }$ .
+(30 points) We are given a $n$-vertex tournament graph ${ \vec { G } } = ( V , A )$ , which is a directed version of a complete undirected graph $G = ( V , E )$ . For each undirected edge $e =$ $( u , v ) \in E$ , we have a corresponding directed arc ( $u  \to v$ or $v \to u$ ) in $A$ . We aim to design an efficient algorithm to find a directed Hamiltonian path in $\vec { G }$ , which is a path including all vertices in $V$ , such as $u _ { 1 } \to u _ { 2 } \to u _ { 3 } \dots \to u _ { n }$ .
 
-- a. (15 points) Assume we have a path $P$ with length $k$ , and another vertex $u$ not included in $P$ . Prove that we can always find a feasible location in $P$ to insert $u$ . (E.g., when $P = v _ { 1 }  v _ { 2 }  v _ { 3 }$ , we can insert $u$ into $P$ and change $P$ to $v _ { 1 }  u  v _ { 2 }  v _ { 3 }$ if $v _ { 1 }  u$ and $u \to v _ { 2 }$ are both in $A$ .) Design an $O ( k )$ algorithm to find a feasible location to insert $u$ into $P$ , analyze the running time, and prove the correctness.   
-- b. (15 points) Use divide and conquer to find a $O ( n \log n )$ algorithm to find a directed Hamiltonian path, analyze the running time, and prove the correctness.
+a. (15 points) Assume we have a path $P$ with length $k$ , and another vertex $u$ not included in $P$ . Prove that we can always find a feasible location in $P$ to insert $u$ . (E.g., when $P = v _ { 1 } \to v _ { 2 } \to v _ { 3 }$ , we can insert $u$ into $P$ and change $P$ to $v _ { 1 } \to u \to v _ { 2 } \to v _ { 3 }$ if $v _ { 1 } \to u$ and $u \to v _ { 2 }$ are both in $A$ .) Design an $O ( k )$ algorithm to find a feasible location to insert $u$ into $P$ , analyze the running time, and prove the correctness.  
+
+**Algorithm**
+
+Scan the path $P = v_1 \to \cdots \to v_k$, find the smallest index $i$ such that $u\to v_i$. If no such $i$ exists, append $u$ at the end.
+
+**Validity analysis**
+There are in total two cases:
+- If $i$ exists. Since the graph is a tournament, for all $j<i$, we must have $v_j \to u$. Hence:
+  $$v_{i-1} \to u \to v_i$$
+  when $i>1$. If $i=1$, $u \to v_1$, which is trivial. So insertion is valid.
+
+- Otherwise, $v_i \to u$ for all $i$. So appending $u$ maintains a valid path.
+
+**Running time**
+The algorithm scans the path once. So time complexity is 
+$$T(k) = O(k)$$
+
+---
+
+
+b. (15 points) Use divide and conquer to find a $O ( n \log n )$ algorithm to find a directed Hamiltonian path, analyze the running time, and prove the correctness.
+
+**Algorithm**
+Recursively split the vertex set into two halves, compute Hamiltonian paths $P_1$ and $P_2$, and merge them by repeatedly comparing the current heads of the two paths and appending the vertex whose outgoing edge points to the other.
+
+**Pseudo code**
+
+```python
+def merge(P1: List[Vertex], P2: List[Vertex]) -> List[Vertex]:
+    i, j = 0, 0
+    P = []
+    while (i < len(P1) and j < len(P2)):
+        if (P1[i].to(P2[j])):
+            P.append(P1[i])
+            i += 1
+        else:
+            P.append(P2[j])
+            j += 1
+
+    # Append the rest
+    while i < len(P1):
+        P.append(P1[i])
+        i += 1
+
+    while j < len(P2):
+        P.append(P2[j])
+        j += 1
+    return P
+
+def HamiltonianPath(V: List[Vertex]) -> List[Vertex]:
+    """
+    Args:
+        V: Vertices of the tournament
+    Returns:
+        A Hamiltonian path of the tournament
+    """
+    if (len(V) == 1):
+        return V
+    
+    size = len(V)
+    V1 = V[:size//2]
+    V2 = V[size//2:]
+
+    P1 = HamiltonianPath(V1)
+    P2 = HamiltonianPath(V2)
+
+    return merge(P1, P2)
+```
+
+**Validity analysis**
+
+* Each recursive call returns a valid Hamiltonian path.
+* During merge, for any two candidate vertices $a_i$ and $b_j$, exactly one of $a_i \to b_j$ or $b_j \to a_i$ holds.
+* The algorithm always appends the vertex that maintains the path direction.
+* Hence, the merged sequence is a valid directed path containing all vertices.
+
+
+**Running time**
+
+The recursive expression is
+
+$$T(n) = 2T(\tfrac{n}{2}) + O(n)$$
+
+Where $O(n)$ comes from the `merge` operation.
+
+Thus
+
+$$T(n) = O(n \log n)$$
 
 --- 
 
  How long does it take you to finish the assignment (including thinking and discussion)? Give a score (1,2,3,4,5) to the difficulty. Do you have any collaborators? Please write down their names here.
 
- | problem | difficulty | comment |
- | ------- | ---------- | ------- |
- | 1 | 16384 | 初见端倪 |
- | 2 | 32768 | AI 汗流浃背 |
- | 3 | 65536 | 666演都不演了 |
+ | problem | difficulty | dependence on LLM | comment |
+ | ------- | ---------- | ----------------- | ------- |
+ | 1 | 16384 | 50% | 初见端倪 |
+ | 2 | 32768 | 50% | AI 汗流浃背 |
+ | 3 | 65536 | 75% | 666演都不演了 |
+ | 4 | 32768 | 50% | 终于写完了！耶 |
+ | 5 | 1     | 0% | 这题可以，能处 |
